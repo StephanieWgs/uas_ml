@@ -6,6 +6,7 @@ import 'main.dart';
 import 'pengembalian.dart';
 import 'historypinjaman.dart';
 import 'historypengembalian.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -131,10 +132,18 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: Icon(Icons.logout, color: Colors.red.shade400),
               title: const Text("Logout"),
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const MyApp()),
-              ),
+              onTap: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                // Hapus data sesi pengguna
+                await prefs.remove('kode_pustakawan');
+
+                // Kembali ke halaman login
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyApp()),
+                );
+              },
             ),
           ],
         ),

@@ -58,7 +58,7 @@ class _BukuState extends State<Buku> {
   }
 
   //Hapus Buku
-  void deleteBuku(String kodeBuku) {
+  void deleteBuku(String kodeBuku) async{
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -71,6 +71,19 @@ class _BukuState extends State<Buku> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 32.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               child: const Text("Batal"),
             ),
             ElevatedButton(
@@ -95,6 +108,19 @@ class _BukuState extends State<Buku> {
                   fetchData();
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade400,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 32.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               child: const Text("Hapus"),
             ),
           ],
@@ -108,8 +134,6 @@ class _BukuState extends State<Buku> {
     showDialog(
       context: context,
       builder: (context) {
-        final TextEditingController kodeBukuController =
-            TextEditingController();
         final TextEditingController judulController = TextEditingController();
         final TextEditingController penulisController = TextEditingController();
         final TextEditingController penerbitController =
@@ -133,18 +157,6 @@ class _BukuState extends State<Buku> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: kodeBukuController,
-                      keyboardType: TextInputType.emailAddress,
-                      autocorrect: false,
-                      decoration: const InputDecoration(
-                        labelText: "Kode Buku",
-                        border: OutlineInputBorder(),
-                        prefixIcon:
-                            Icon(Icons.code_rounded, color: Colors.blue),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -224,13 +236,26 @@ class _BukuState extends State<Buku> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           child: const Text('Batal'),
                         ),
+                        SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: () async {
                             // Cek apakah ada field yang kosong
-                            if (kodeBukuController.text.isEmpty ||
-                                judulController.text.isEmpty ||
+                            if (judulController.text.isEmpty ||
                                 penulisController.text.isEmpty ||
                                 penerbitController.text.isEmpty ||
                                 kategoriController.text.isEmpty ||
@@ -259,7 +284,6 @@ class _BukuState extends State<Buku> {
                             var response = await http.post(
                                 Uri.parse("http://localhost/uasml/api/buku"),
                                 body: {
-                                  "kode_buku": kodeBukuController.text,
                                   "judul": judulController.text,
                                   "penulis": penulisController.text,
                                   "penerbit": penerbitController.text,
@@ -288,7 +312,165 @@ class _BukuState extends State<Buku> {
                             }
                             Navigator.pop(context);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           child: const Text('Simpan'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void detailBuku(String kodeBuku) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final buku =
+            daftarBuku.firstWhere((buku) => buku['kode_buku'] == kodeBuku);
+        final TextEditingController judulController =
+            TextEditingController(text: buku['judul']);
+        final TextEditingController penulisController =
+            TextEditingController(text: buku['penulis']);
+        final TextEditingController penerbitController =
+            TextEditingController(text: buku['penerbit']);
+        final TextEditingController kategoriController =
+            TextEditingController(text: buku['kategori']);
+        final TextEditingController tahunController =
+            TextEditingController(text: buku['tahun']);
+        final TextEditingController stokController =
+            TextEditingController(text: buku['stok']);
+
+        return Dialog(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width, // buat lebar penuh
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20.0, right: 20.0, top: 40.0, bottom: 40.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Detail Buku',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: judulController,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Judul Buku",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.book, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: penulisController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Penulis Buku",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: penerbitController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Penerbit Buku",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.print, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: kategoriController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Kategori Buku",
+                        border: OutlineInputBorder(),
+                        prefixIcon:
+                            Icon(Icons.menu_open_outlined, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: tahunController,
+                      keyboardType: TextInputType.number,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Tahun Buku",
+                        border: OutlineInputBorder(),
+                        prefixIcon:
+                            Icon(Icons.calendar_month, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: stokController,
+                      keyboardType: TextInputType.number,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Stok",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.library_books_rounded,
+                            color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: const Text('Tutup'),
                         ),
                       ],
                     ),
@@ -415,8 +597,22 @@ class _BukuState extends State<Buku> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           child: const Text('Batal'),
                         ),
+                        SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: () async {
                             // Cek apakah ada field yang kosong
@@ -478,6 +674,19 @@ class _BukuState extends State<Buku> {
                             }
                             Navigator.pop(context);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           child: const Text('Simpan'),
                         ),
                       ],
@@ -512,6 +721,19 @@ class _BukuState extends State<Buku> {
                   onPressed: () {
                     tambahBuku();
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 32.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   child: const Text('Tambah Buku'),
                 ),
               ],
@@ -535,7 +757,7 @@ class _BukuState extends State<Buku> {
                               4: FlexColumnWidth(),
                               5: FlexColumnWidth(),
                               6: FlexColumnWidth(),
-                              7: FixedColumnWidth(100.0),
+                              7: FixedColumnWidth(150.0),
                             },
                             children: [
                               // Header Tabel
@@ -627,6 +849,12 @@ class _BukuState extends State<Buku> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.info,
+                                              color: Colors.amber),
+                                          onPressed: () =>
+                                              detailBuku(buku['kode_buku']!),
+                                        ),
                                         IconButton(
                                           icon: const Icon(Icons.edit,
                                               color: Colors.blue),

@@ -55,6 +55,121 @@ class _MemberState extends State<Member> {
     }
   }
 
+  //detail
+  void detailMember(String kodemember) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final member = daftarMember
+            .firstWhere((member) => member['id_member'] == kodemember);
+        final TextEditingController namaController =
+            TextEditingController(text: member['nama']);
+        final TextEditingController alamatController =
+            TextEditingController(text: member['alamat']);
+        final TextEditingController emailController =
+            TextEditingController(text: member['email']);
+        final TextEditingController noHpController =
+            TextEditingController(text: member['no_hp']);
+        return Dialog(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width, // buat lebar penuh
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20.0, right: 20.0, top: 40.0, bottom: 40.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Detail member',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: namaController,
+                      enabled: false,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      decoration: const InputDecoration(
+                        labelText: "Nama member",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: alamatController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Alamat member",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.map, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "Email member",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.mail, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: noHpController,
+                      keyboardType: TextInputType.text,
+                      autocorrect: false,
+                      enabled: false,
+                      decoration: const InputDecoration(
+                        labelText: "No HP member",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.phone, color: Colors.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: const Text('Batal'),
+                        ),
+                        SizedBox(width: 10),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   //Hapus member
   void deleteMember(String kodemember) {
     showDialog(
@@ -69,8 +184,22 @@ class _MemberState extends State<Member> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 32.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               child: const Text("Batal"),
             ),
+            SizedBox(width: 10),
             ElevatedButton(
               onPressed: () async {
                 Navigator.of(context).pop();
@@ -93,6 +222,19 @@ class _MemberState extends State<Member> {
                   fetchData();
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade400,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 32.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               child: const Text("Hapus"),
             ),
           ],
@@ -193,8 +335,22 @@ class _MemberState extends State<Member> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           child: const Text('Batal'),
                         ),
+                        SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: () async {
                             // Cek apakah ada field yang kosong
@@ -255,7 +411,7 @@ class _MemberState extends State<Member> {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade800,
+                            backgroundColor: Colors.green,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                                 vertical: 20.0, horizontal: 32.0),
@@ -267,7 +423,7 @@ class _MemberState extends State<Member> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          child: const Text('Simpan'),
+                          child: const Text('Tambah'),
                         ),
                       ],
                     ),
@@ -282,7 +438,7 @@ class _MemberState extends State<Member> {
   }
 
   // Fungsi untuk mengedit member
-  void editmember(String kodemember) {
+  void editMember(String kodemember) {
     showDialog(
       context: context,
       builder: (context) {
@@ -364,8 +520,22 @@ class _MemberState extends State<Member> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           child: const Text('Batal'),
                         ),
+                        SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: () async {
                             // Cek apakah ada field yang kosong
@@ -424,8 +594,8 @@ class _MemberState extends State<Member> {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue.shade800,
-                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.amber,
+                            foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(
                                 vertical: 20.0, horizontal: 32.0),
                             shape: RoundedRectangleBorder(
@@ -471,7 +641,7 @@ class _MemberState extends State<Member> {
                     tambahmember();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade800,
+                    backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         vertical: 20.0, horizontal: 32.0),
@@ -483,7 +653,7 @@ class _MemberState extends State<Member> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: const Text('Tambah member'),
+                  child: const Text('Tambah'),
                 ),
               ],
             ),
@@ -499,11 +669,12 @@ class _MemberState extends State<Member> {
                           scrollDirection: Axis.vertical,
                           child: Table(
                             columnWidths: const {
-                              0: FlexColumnWidth(),
-                              1: FlexColumnWidth(),
-                              2: FlexColumnWidth(),
-                              3: FlexColumnWidth(),
-                              4: FlexColumnWidth(),
+                              0: FlexColumnWidth(0.8),
+                              1: FlexColumnWidth(1.0),
+                              2: FlexColumnWidth(2.0),
+                              3: FlexColumnWidth(2.0),
+                              4: FlexColumnWidth(1.2),
+                              5: FlexColumnWidth(),
                             },
                             children: [
                               // Header Tabel
@@ -554,7 +725,7 @@ class _MemberState extends State<Member> {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(member['nama']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.start),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -576,10 +747,16 @@ class _MemberState extends State<Member> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         IconButton(
+                                          icon: const Icon(Icons.info,
+                                              color: Colors.amber),
+                                          onPressed: () => detailMember(
+                                              member['id_member']!),
+                                        ),
+                                        IconButton(
                                           icon: const Icon(Icons.edit,
                                               color: Colors.blue),
                                           onPressed: () =>
-                                              editmember(member['id_member']!),
+                                              editMember(member['id_member']!),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete,

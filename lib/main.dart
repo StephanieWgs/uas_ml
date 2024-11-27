@@ -92,6 +92,7 @@ class _HomePageState extends State<HomePage> {
                 var data = jsonDecode(response.body);
 
                 if (data['status'] == 1) {
+
                   await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) {
