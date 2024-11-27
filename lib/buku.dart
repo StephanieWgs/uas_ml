@@ -58,7 +58,7 @@ class _BukuState extends State<Buku> {
   }
 
   //Hapus Buku
-  void deleteBuku(String kodeBuku) async{
+  void deleteBuku(String kodeBuku) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -367,9 +367,9 @@ class _BukuState extends State<Buku> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const Text(
-                      'Detail Buku',
-                      style: TextStyle(
+                    Text(
+                      'Detail Buku $kodeBuku',
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -513,9 +513,9 @@ class _BukuState extends State<Buku> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const Text(
-                      'Edit Buku',
-                      style: TextStyle(
+                    Text(
+                      'Edit Buku $kodeBuku',
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),

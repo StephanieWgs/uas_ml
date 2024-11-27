@@ -1,21 +1,371 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class Pengembalian extends StatelessWidget {
+class Pengembalian extends StatefulWidget {
   const Pengembalian({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.credit_card, size: 100, color: Colors.blue),
-          SizedBox(height: 20),
-          Text(
-            'Daftar Pengembalian',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  _PengembalianState createState() => _PengembalianState();
+}
+
+class _PengembalianState extends State<Pengembalian> {
+  List<Map<String, String>> daftarPinjaman = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      final response = await http.get(
+          Uri.parse('http://localhost/uasml/api/pinjaman?status=dipinjam'));
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        setState(() {
+          daftarPinjaman =
+              List<Map<String, String>>.from(responseData['data'].map((item) {
+            return {
+              'tgl_pinjam': item['tgl_pinjam'].toString(),
+              'kode_pinjaman': item['kode_pinjaman'].toString(),
+              'id_member': item['id_member'].toString(),
+              'kode_buku': item['kode_buku'].toString(),
+            };
+          }).toList());
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          daftarPinjaman = [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print('Error: $e');
+    }
+  }
+
+  void updateStatus(String kodePinjaman) async {
+    var response = await http.post(
+      Uri.parse('http://localhost/uasml/api/pinjaman?id=$kodePinjaman'),
+      body: {'status': 'kembali'},
+    );
+    if (response.statusCode == 200) {
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Pinjaman $kodePinjaman telah dikembalikan'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      setState(() {
+        daftarPinjaman.removeWhere(
+            (pinjaman) => pinjaman['kode_pinjaman'] == kodePinjaman);
+      });
+      fetchData();
+    }
+  }
+
+  void bukuKembali($kode_pinjaman) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final TextEditingController tglKembaliController =
+            TextEditingController();
+
+        Future<void> _selectDate() async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+
+          if (pickedDate != null) {
+            setState(() {
+              // Menyimpan tanggal yang dipilih ke dalam controller
+              tglKembaliController.text = pickedDate.toString().split(" ")[0];
+            });
+          }
+        }
+
+        return Dialog(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20.0, right: 20.0, top: 40.0, bottom: 40.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Buku Kembali',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: tglKembaliController,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        labelText: "Tgl Kembali",
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.date_range, color: Colors.blue),
+                      ),
+                      onTap: () {
+                        _selectDate();
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: const Text('Batal'),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () async {
+                            // Cek apakah ada field yang kosong
+                            if (tglKembaliController.text.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Peringatan'),
+                                    content: const Text(
+                                        'Tidak boleh ada data yang kosong'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              return;
+                            }
+                            var response = await http.post(
+                                Uri.parse(
+                                    "http://localhost/uasml/api/pengembalian"),
+                                body: {
+                                  'kode_pinjaman': $kode_pinjaman,
+                                  "tgl_kembali": tglKembaliController.text,
+                                });
+
+                            if (response.statusCode == 200) {
+                              updateStatus($kode_pinjaman);
+                              print('Response status: ${response.statusCode}');
+                              print('Response body: ${response.body}');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Data pengembalian berhasil ditambah'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              fetchData();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Sepertinya ada kesalahan server, harap tunggu bentar dan dicoba lagi yak'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 20.0, horizontal: 32.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          child: const Text('Buku Kembali'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(
+            left: 40.0, right: 40.0, top: 20.0, bottom: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'List Pinjaman Berjalan',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : daftarPinjaman.isEmpty
+                      ? const Center(child: Text('Tidak ada data tersedia'))
+                      : SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Table(
+                            columnWidths: const {
+                              0: FlexColumnWidth(0.8),
+                              1: FlexColumnWidth(1.0),
+                              3: FlexColumnWidth(1.2),
+                              4: FlexColumnWidth(1.0),
+                              5: FlexColumnWidth(),
+                            },
+                            children: [
+                              // Header Tabel
+                              const TableRow(
+                                decoration: BoxDecoration(color: Colors.blue),
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Tgl Pinjam',
+                                        textAlign: TextAlign.center),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Kode Pinjaman',
+                                        textAlign: TextAlign.center),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('NIM',
+                                        textAlign: TextAlign.center),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Kode Buku',
+                                        textAlign: TextAlign.center),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text('Aksi',
+                                        textAlign: TextAlign.center),
+                                  ),
+                                ],
+                              ),
+
+                              ...daftarPinjaman.map((pinjaman) {
+                                return TableRow(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(pinjaman['tgl_pinjam']!,
+                                          textAlign: TextAlign.center),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(pinjaman['kode_pinjaman']!,
+                                          textAlign: TextAlign.center),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(pinjaman['id_member']!,
+                                          textAlign: TextAlign.center),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(pinjaman['kode_buku']!,
+                                          textAlign: TextAlign.center),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              bukuKembali(
+                                                  pinjaman['kode_pinjaman']!);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.green,
+                                              foregroundColor: Colors.white,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10.0,
+                                                      horizontal: 16.0),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              textStyle: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            child: const Text('Proses'),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }

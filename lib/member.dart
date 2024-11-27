@@ -79,9 +79,9 @@ class _MemberState extends State<Member> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const Text(
-                      'Detail member',
-                      style: TextStyle(
+                     Text(
+                      'Detail Member $kodemember',
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -265,7 +265,7 @@ class _MemberState extends State<Member> {
                 child: Column(
                   children: [
                     const Text(
-                      'Tambah member',
+                      'Tambah Member',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -461,9 +461,9 @@ class _MemberState extends State<Member> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const Text(
-                      'Edit member',
-                      style: TextStyle(
+                     Text(
+                      'Edit Member $kodemember',
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -567,10 +567,10 @@ class _MemberState extends State<Member> {
                                 Uri.parse(
                                     "http://localhost/uasml/api/member?id=$kodemember"),
                                 body: {
-                                  "judul": namaController.text,
-                                  "penulis": alamatController.text,
-                                  "penerbit": emailController.text,
-                                  "kategori": noHpController.text,
+                                  "nama": namaController.text,
+                                  "alamat": alamatController.text,
+                                  "email": emailController.text,
+                                  "no_hp": noHpController.text,
                                 });
                             if (response.statusCode == 200) {
                               print('Response status: ${response.statusCode}');
