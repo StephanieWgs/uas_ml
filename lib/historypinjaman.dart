@@ -170,6 +170,10 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
   }
 
   void deletePinjaman(String kodePinjaman) {
+    final pinjaman = daftarPinjaman
+        .firstWhere((pinjaman) => pinjaman['kode_pinjaman'] == kodePinjaman);
+    final TextEditingController kodeBukuC =
+        TextEditingController(text: pinjaman['kode_buku']);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -206,7 +210,15 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
                       'http://localhost/uasml/api/pinjaman?id=$kodePinjaman'),
                 );
 
-                if (response.statusCode == 200) {
+                var updateStok = await http.post(
+                    Uri.parse(
+                        "http://localhost/uasml/api/buku?id=${kodeBukuC.text}"),
+                    body: {
+                      "action": "kembali",
+                    });
+
+                if (response.statusCode == 200 &&
+                    updateStok.statusCode == 200) {
                   print('Response status: ${response.statusCode}');
                   print('Response body: ${response.body}');
 
@@ -253,6 +265,22 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
             TextEditingController(text: pinjaman['kode_buku']);
         final TextEditingController statusController =
             TextEditingController(text: pinjaman['status']);
+
+        Future<void> _selectDate() async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+
+          if (pickedDate != null) {
+            setState(() {
+              tglPinjamController.text = pickedDate.toString().split(" ")[0];
+            });
+          }
+        }
+
         return Dialog(
           child: SizedBox(
             width: MediaQuery.of(context).size.width, // buat lebar penuh
@@ -273,12 +301,16 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
                     TextField(
                       controller: tglPinjamController,
                       keyboardType: TextInputType.emailAddress,
+                      readOnly: true,
                       autocorrect: false,
                       decoration: const InputDecoration(
                         labelText: "Tgl Pinjam",
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.date_range, color: Colors.blue),
                       ),
+                      onTap: () {
+                        _selectDate();
+                      },
                     ),
                     const SizedBox(height: 20),
                     TextField(
@@ -310,7 +342,7 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
                       decoration: const InputDecoration(
                         labelText: "Status Pinjaman",
                         border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.phone, color: Colors.blue),
+                        prefixIcon: Icon(Icons.info, color: Colors.blue),
                       ),
                     ),
                     const SizedBox(height: 20),

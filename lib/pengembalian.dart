@@ -75,7 +75,11 @@ class _PengembalianState extends State<Pengembalian> {
     }
   }
 
-  void bukuKembali($kode_pinjaman) {
+  void bukuKembali(String kodePinjaman) {
+    final pinjaman = daftarPinjaman
+        .firstWhere((pinjaman) => pinjaman['kode_pinjaman'] == kodePinjaman);
+    final TextEditingController kodeBukuC =
+        TextEditingController(text: pinjaman['kode_buku']);
     showDialog(
       context: context,
       builder: (context) {
@@ -181,12 +185,20 @@ class _PengembalianState extends State<Pengembalian> {
                                 Uri.parse(
                                     "http://localhost/uasml/api/pengembalian"),
                                 body: {
-                                  'kode_pinjaman': $kode_pinjaman,
+                                  'kode_pinjaman': kodePinjaman,
                                   "tgl_kembali": tglKembaliController.text,
                                 });
 
-                            if (response.statusCode == 200) {
-                              updateStatus($kode_pinjaman);
+                            var updateStok = await http.post(
+                                Uri.parse(
+                                    "http://localhost/uasml/api/buku?id=${kodeBukuC.text}"),
+                                body: {
+                                  "action": "kembali",
+                                });
+
+                            if (response.statusCode == 200 &&
+                                updateStok.statusCode == 200) {
+                              updateStatus(kodePinjaman);
                               print('Response status: ${response.statusCode}');
                               print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(

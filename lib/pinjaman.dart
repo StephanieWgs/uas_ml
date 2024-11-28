@@ -111,12 +111,25 @@ class _PinjamanState extends State<Pinjaman> {
                       "kode_buku": kodeBukuC.text,
                       "tgl_pinjam": tglPinjamC.text,
                     });
-                if (response.statusCode == 200) {
+
+                var updateStok = await http.post(
+                    Uri.parse(
+                        "http://localhost/uasml/api/buku?id=${kodeBukuC.text}"),
+                    body: {
+                      "action": "pinjam",
+                    });
+
+                if (response.statusCode == 200 &&
+                    updateStok.statusCode == 200) {
                   print('Response status: ${response.statusCode}');
                   print('Response body: ${response.body}');
+                  idMemberC.clear();
+                  kodeBukuC.clear();
+                  tglPinjamC.clear();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Data Pinjaman berhasil ditambah'),
+                      content: Text(
+                          'Data Pinjaman berhasil ditambah'),
                       backgroundColor: Colors.green,
                     ),
                   );

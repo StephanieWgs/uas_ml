@@ -79,7 +79,7 @@ class _MemberState extends State<Member> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                     Text(
+                    Text(
                       'Detail Member $kodemember',
                       style: const TextStyle(
                         fontSize: 24,
@@ -461,7 +461,7 @@ class _MemberState extends State<Member> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                     Text(
+                    Text(
                       'Edit Member $kodemember',
                       style: const TextStyle(
                         fontSize: 24,

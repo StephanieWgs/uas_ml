@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:uas_ml/pengembalian.dart';
 
 class HistoryPengembalian extends StatefulWidget {
   const HistoryPengembalian({super.key});
@@ -11,6 +12,7 @@ class HistoryPengembalian extends StatefulWidget {
 
 class _HistoryPengembalianState extends State<HistoryPengembalian> {
   List<Map<String, String>> daftarPengembalian = [];
+  List<Map<String, String>> daftarPinjaman = [];
   bool isLoading = true;
 
   @override
@@ -23,9 +25,9 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
     try {
       final response =
           await http.get(Uri.parse('http://localhost/uasml/api/pengembalian'));
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      if (response.statusCode == 200) {
+      final pinjaman =
+          await http.get(Uri.parse('http://localhost/uasml/api/pinjaman'));
+      if (response.statusCode == 200 && pinjaman.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         setState(() {
           daftarPengembalian =
@@ -34,6 +36,16 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
               'tgl_kembali': item['tgl_kembali'].toString(),
               'kode_pengembalian': item['kode_pengembalian'].toString(),
               'kode_pinjaman': item['kode_pinjaman'].toString(),
+            };
+          }).toList());
+          daftarPinjaman =
+              List<Map<String, String>>.from(responseData['data'].map((item) {
+            return {
+              'tgl_pinjam': item['tgl_pinjam'].toString(),
+              'kode_pinjaman': item['kode_pinjaman'].toString(),
+              'id_member': item['id_member'].toString(),
+              'kode_buku': item['kode_buku'].toString(),
+              'status': item['status'].toString(),
             };
           }).toList());
           isLoading = false;
@@ -52,13 +64,27 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
     }
   }
 
+  Future<void> updateStatus(String kodePinjaman) async {
+    var response = await http.post(
+      Uri.parse('http://localhost/uasml/api/pinjaman?id=$kodePinjaman'),
+      body: {'status': 'dipinjam'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    } else {
+      print('Gagal update status: ${response.statusCode} - ${response.body}');
+    }
+  }
+
   //detail
   void detailPengembalian(String kodePengembalian) async {
     showDialog(
       context: context,
       builder: (context) {
-        final member = daftarPengembalian.firstWhere(
-            (pengembalian) => pengembalian['kode_pengembalian'] == kodePengembalian);
+        final member = daftarPengembalian.firstWhere((pengembalian) =>
+            pengembalian['kode_pengembalian'] == kodePengembalian);
         final TextEditingController tglKembaliController =
             TextEditingController(text: member['tgl_kembali']);
         final TextEditingController kodePinjamanController =
@@ -140,12 +166,20 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
   }
 
   void deletePengembalian(String kodePengembalian) {
+    final pengembalian = daftarPengembalian.firstWhere((pengembalian) =>
+        pengembalian['kode_pengembalian'] == kodePengembalian);
+    final kodePinjaman = pengembalian['kode_pinjaman'];
+    final pinjaman = daftarPinjaman
+        .firstWhere((pinjaman) => pinjaman['kode_pinjaman'] == kodePinjaman);
+    final kodeBuku = pinjaman['kode_pinjaman'];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Konfirmasi"),
-          content: Text("Apakah Anda ingin menghapus pengembalian $kodePengembalian?"),
+          content: Text(
+              "Apakah Anda ingin menghapus pengembalian $kodePengembalian?"),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -176,10 +210,19 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                       'http://localhost/uasml/api/pengembalian?id=$kodePengembalian'),
                 );
 
-                if (response.statusCode == 200) {
-                  print('Response status: ${response.statusCode}');
-                  print('Response body: ${response.body}');
+                var updateStok = await http.post(
+                    Uri.parse(
+                        "http://localhost/uasml/api/buku?id=${kodeBuku.toString()}"),
+                    body: {
+                      "action": "pinjam",
+                    });
 
+                if (response.statusCode == 200 &&
+                    updateStok.statusCode == 200) {
+                  print('updateStok status: ${updateStok.statusCode}');
+                  print('updateStok body: ${updateStok.body}');
+
+                  updateStatus(kodePinjaman.toString());
                   setState(() {
                     daftarPengembalian.removeWhere((pengembalian) =>
                         pengembalian['kode_pengembalian'] == kodePengembalian);
@@ -213,12 +256,27 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
     showDialog(
       context: context,
       builder: (context) {
-        final member = daftarPengembalian.firstWhere(
-            (pengembalian) => pengembalian['kode_pengembalian'] == kodePengembalian);
+        final member = daftarPengembalian.firstWhere((pengembalian) =>
+            pengembalian['kode_pengembalian'] == kodePengembalian);
         final TextEditingController tglKembaliController =
             TextEditingController(text: member['tgl_kembali']);
         final TextEditingController kodePinjamanController =
             TextEditingController(text: member['kode_pinjaman']);
+        Future<void> _selectDate() async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+          );
+
+          if (pickedDate != null) {
+            setState(() {
+              tglKembaliController.text = pickedDate.toString().split(" ")[0];
+            });
+          }
+        }
+
         return Dialog(
           child: SizedBox(
             width: MediaQuery.of(context).size.width, // buat lebar penuh
@@ -245,6 +303,9 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.date_range, color: Colors.blue),
                       ),
+                      onTap: () {
+                        _selectDate();
+                      },
                     ),
                     const SizedBox(height: 20),
                     TextField(
@@ -285,7 +346,7 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                           onPressed: () async {
                             // Cek apakah ada field yang kosong
                             if (tglKembaliController.text.isEmpty ||
-                                kodePinjamanController.text.isEmpty ) {
+                                kodePinjamanController.text.isEmpty) {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -432,12 +493,14 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pengembalian['kode_pengembalian']!,
+                                      child: Text(
+                                          pengembalian['kode_pengembalian']!,
                                           textAlign: TextAlign.center),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pengembalian['kode_pinjaman']!,
+                                      child: Text(
+                                          pengembalian['kode_pinjaman']!,
                                           textAlign: TextAlign.center),
                                     ),
                                     Row(
@@ -448,19 +511,22 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                                           icon: const Icon(Icons.info,
                                               color: Colors.amber),
                                           onPressed: () => detailPengembalian(
-                                              pengembalian['kode_pengembalian']!),
+                                              pengembalian[
+                                                  'kode_pengembalian']!),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.edit,
                                               color: Colors.blue),
                                           onPressed: () => editPengembalian(
-                                              pengembalian['kode_pengembalian']!),
+                                              pengembalian[
+                                                  'kode_pengembalian']!),
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete,
                                               color: Colors.red),
                                           onPressed: () => deletePengembalian(
-                                              pengembalian['kode_pengembalian']!),
+                                              pengembalian[
+                                                  'kode_pengembalian']!),
                                         ),
                                       ],
                                     ),
@@ -477,4 +543,3 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
     );
   }
 }
-

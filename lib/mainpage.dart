@@ -58,9 +58,19 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
-        title: const Text(
-          'Perpustakaan',
-          style: TextStyle(color: Colors.white),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/logo2.png',
+              height: 30,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'Cincai Library',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
         ),
         backgroundColor: Colors.blue.shade800,
         centerTitle: true,

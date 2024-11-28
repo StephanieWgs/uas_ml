@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Perpustakaan',
+          'Cincai Library',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue.shade800,
@@ -50,12 +50,22 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(20),
         children: [
           const SizedBox(height: 20),
+          const Image(image: AssetImage('assets/logo.png'), height: 100),
+          const SizedBox(height: 20),
           const Center(
             child: Text(
-              "Login",
+              "Selamat datang",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const Center(
+            child: Text(
+              "Silakan login...",
+              style: TextStyle(
+                fontSize: 16,
               ),
             ),
           ),
@@ -92,7 +102,6 @@ class _HomePageState extends State<HomePage> {
                 var data = jsonDecode(response.body);
 
                 if (data['status'] == 1) {
-
                   await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) {
