@@ -23,8 +23,8 @@ class _PengembalianState extends State<Pengembalian> {
     try {
       final response = await http.get(
           Uri.parse('http://localhost/uasml/api/pinjaman?status=dipinjam'));
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         setState(() {
@@ -59,8 +59,8 @@ class _PengembalianState extends State<Pengembalian> {
       body: {'status': 'kembali'},
     );
     if (response.statusCode == 200) {
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Pinjaman $kodePinjaman telah dikembalikan'),
@@ -199,8 +199,8 @@ class _PengembalianState extends State<Pengembalian> {
                             if (response.statusCode == 200 &&
                                 updateStok.statusCode == 200) {
                               updateStatus(kodePinjaman);
-                              print('Response status: ${response.statusCode}');
-                              print('Response body: ${response.body}');
+                              // print('Response status: ${response.statusCode}');
+                              // print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
@@ -284,88 +284,116 @@ class _PengembalianState extends State<Pengembalian> {
                             children: [
                               // Header Tabel
                               const TableRow(
-                                decoration: BoxDecoration(color: Colors.blue),
+                                decoration:
+                                    BoxDecoration(color: Colors.blueAccent),
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Tgl Pinjam',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Tgl Pinjam',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode Pinjaman',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode Pinjaman',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('NIM',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'NIM',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode Buku',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode Buku',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Aksi',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Aksi',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                 ],
                               ),
 
                               ...daftarPinjaman.map((pinjaman) {
                                 return TableRow(
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    color: Colors.white,
+                                  ),
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(pinjaman['tgl_pinjam']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(pinjaman['kode_pinjaman']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(pinjaman['id_member']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(pinjaman['kode_buku']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              bukuKembali(
-                                                  pinjaman['kode_pinjaman']!);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.green,
-                                              foregroundColor: Colors.white,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10.0,
-                                                      horizontal: 16.0),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              textStyle: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            child: const Text('Proses'),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons
+                                                .swap_horizontal_circle_outlined,
+                                            color: Colors.green,
                                           ),
+                                          onPressed: () {
+                                            bukuKembali(
+                                                pinjaman['kode_pinjaman']!);
+                                          },
                                         )
                                       ],
                                     ),

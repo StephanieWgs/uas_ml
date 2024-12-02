@@ -24,8 +24,8 @@ class _BukuState extends State<Buku> {
     try {
       final response =
           await http.get(Uri.parse('http://localhost/uasml/api/buku'));
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         setState(() {
@@ -96,8 +96,8 @@ class _BukuState extends State<Buku> {
                 );
 
                 if (response.statusCode == 200) {
-                  print('Response status: ${response.statusCode}');
-                  print('Response body: ${response.body}');
+                  // print('Response status: ${response.statusCode}');
+                  // print('Response body: ${response.body}');
 
                   // Update daftar member setelah penghapusan
                   setState(() {
@@ -292,8 +292,8 @@ class _BukuState extends State<Buku> {
                                   "stok": stokController.text
                                 });
                             if (response.statusCode == 200) {
-                              print('Response status: ${response.statusCode}');
-                              print('Response body: ${response.body}');
+                              // print('Response status: ${response.statusCode}');
+                              // print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Data buku berhasil ditambah'),
@@ -654,8 +654,8 @@ class _BukuState extends State<Buku> {
                                   "stok": stokController.text
                                 });
                             if (response.statusCode == 200) {
-                              print('Response status: ${response.statusCode}');
-                              print('Response body: ${response.body}');
+                              // print('Response status: ${response.statusCode}');
+                              // print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Data buku berhasil diubah'),
@@ -755,9 +755,7 @@ class _BukuState extends State<Buku> {
                               2: FlexColumnWidth(),
                               3: FlexColumnWidth(),
                               4: FlexColumnWidth(),
-                              5: FlexColumnWidth(),
-                              6: FlexColumnWidth(),
-                              7: FixedColumnWidth(150.0),
+                              5: FixedColumnWidth(150.0),
                             },
                             children: [
                               // Header Tabel
@@ -766,84 +764,114 @@ class _BukuState extends State<Buku> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Judul',
-                                        textAlign: TextAlign.start),
+                                    child: Text(
+                                      'Judul',
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Penulis',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Penulis',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Penerbit',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kategori',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kategori',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Stok',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Tahun',
-                                        textAlign: TextAlign.center),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('Stok',
-                                        textAlign: TextAlign.center),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('Aksi',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Aksi',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                 ],
                               ),
                               // Data Buku
                               ...daftarBuku.map((buku) {
                                 return TableRow(
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    color: Colors.white,
+                                  ),
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(buku['kode_buku']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(buku['judul']!,
-                                          textAlign: TextAlign.start),
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(buku['penulis']!,
-                                          textAlign: TextAlign.center),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(buku['penerbit']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(buku['kategori']!,
-                                          textAlign: TextAlign.center),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(buku['tahun']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(buku['stok']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Row(
                                       mainAxisAlignment:

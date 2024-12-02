@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Pinjaman extends StatefulWidget {
@@ -121,15 +120,14 @@ class _PinjamanState extends State<Pinjaman> {
 
                 if (response.statusCode == 200 &&
                     updateStok.statusCode == 200) {
-                  print('Response status: ${response.statusCode}');
-                  print('Response body: ${response.body}');
+                  // print('Response status: ${response.statusCode}');
+                  // print('Response body: ${response.body}');
                   idMemberC.clear();
                   kodeBukuC.clear();
                   tglPinjamC.clear();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text(
-                          'Data Pinjaman berhasil ditambah'),
+                      content: Text('Data Pinjaman berhasil ditambah'),
                       backgroundColor: Colors.green,
                     ),
                   );

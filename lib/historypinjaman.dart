@@ -23,8 +23,8 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
     try {
       final response =
           await http.get(Uri.parse('http://localhost/uasml/api/pinjaman'));
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         setState(() {
@@ -219,8 +219,8 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
 
                 if (response.statusCode == 200 &&
                     updateStok.statusCode == 200) {
-                  print('Response status: ${response.statusCode}');
-                  print('Response body: ${response.body}');
+                  // print('Response status: ${response.statusCode}');
+                  // print('Response body: ${response.body}');
 
                   setState(() {
                     daftarPinjaman.removeWhere((pinjaman) =>
@@ -338,6 +338,7 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
                     TextField(
                       controller: statusController,
                       keyboardType: TextInputType.text,
+                      enabled: false,
                       autocorrect: false,
                       decoration: const InputDecoration(
                         labelText: "Status Pinjaman",
@@ -406,8 +407,8 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
                                   "status": statusController.text,
                                 });
                             if (response.statusCode == 200) {
-                              print('Response status: ${response.statusCode}');
-                              print('Response body: ${response.body}');
+                              // print('Response status: ${response.statusCode}');
+                              // print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content:
@@ -495,64 +496,124 @@ class _HistoryPinjamanState extends State<HistoryPinjaman> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Tgl Pinjam',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Tgl Pinjam',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('ID Member',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'ID Member',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode Buku',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode Buku',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Status',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Status',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Aksi',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Aksi',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                 ],
                               ),
 
                               ...daftarPinjaman.map((pinjaman) {
                                 return TableRow(
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    color: Colors.white,
+                                  ),
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pinjaman['tgl_pinjam']!,
-                                          textAlign: TextAlign.center),
+                                      child: Text(
+                                        pinjaman['tgl_pinjam']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pinjaman['kode_pinjaman']!,
-                                          textAlign: TextAlign.center),
+                                      child: Text(
+                                        pinjaman['kode_pinjaman']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pinjaman['id_member']!,
-                                          textAlign: TextAlign.center),
+                                      child: Text(
+                                        pinjaman['id_member']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pinjaman['kode_buku']!,
-                                          textAlign: TextAlign.center),
+                                      child: Text(
+                                        pinjaman['kode_buku']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pinjaman['status']!,
-                                          textAlign: TextAlign.center),
+                                      child: Text(
+                                        pinjaman['status']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Row(
                                       mainAxisAlignment:

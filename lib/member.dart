@@ -24,8 +24,8 @@ class _MemberState extends State<Member> {
     try {
       final response =
           await http.get(Uri.parse('http://localhost/uasml/api/member'));
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         setState(() {
@@ -210,8 +210,8 @@ class _MemberState extends State<Member> {
                 );
 
                 if (response.statusCode == 200) {
-                  print('Response status: ${response.statusCode}');
-                  print('Response body: ${response.body}');
+                  // print('Response status: ${response.statusCode}');
+                  // print('Response body: ${response.body}');
 
                   // Update daftar member setelah penghapusan
                   setState(() {
@@ -389,8 +389,8 @@ class _MemberState extends State<Member> {
                                   "no_hp": noHpController.text,
                                 });
                             if (response.statusCode == 200) {
-                              print('Response status: ${response.statusCode}');
-                              print('Response body: ${response.body}');
+                              // print('Response status: ${response.statusCode}');
+                              // print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content:
@@ -573,8 +573,8 @@ class _MemberState extends State<Member> {
                                   "no_hp": noHpController.text,
                                 });
                             if (response.statusCode == 200) {
-                              print('Response status: ${response.statusCode}');
-                              print('Response body: ${response.body}');
+                              // print('Response status: ${response.statusCode}');
+                              // print('Response body: ${response.body}');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Data member berhasil diubah'),
@@ -672,9 +672,8 @@ class _MemberState extends State<Member> {
                               0: FlexColumnWidth(0.8),
                               1: FlexColumnWidth(1.0),
                               2: FlexColumnWidth(2.0),
-                              3: FlexColumnWidth(2.0),
-                              4: FlexColumnWidth(1.2),
-                              5: FlexColumnWidth(),
+                              3: FlexColumnWidth(1.2),
+                              4: FlexColumnWidth(),
                             },
                             children: [
                               // Header Tabel
@@ -683,64 +682,96 @@ class _MemberState extends State<Member> {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child:
-                                        Text('ID', textAlign: TextAlign.center),
+                                    child: Text(
+                                      'ID',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Nama',
-                                        textAlign: TextAlign.start),
+                                    child: Text(
+                                      'Nama',
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Alamat',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Email',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Email',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'NO HP',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('NO HP',
-                                        textAlign: TextAlign.center),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text('Aksi',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Aksi',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                 ],
                               ),
                               // Data member
                               ...daftarMember.map((member) {
                                 return TableRow(
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    color: Colors.white,
+                                  ),
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(member['id_member']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(member['nama']!,
-                                          textAlign: TextAlign.start),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(member['alamat']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.start,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(member['email']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(member['no_hp']!,
-                                          textAlign: TextAlign.center),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
                                     ),
                                     Row(
                                       mainAxisAlignment:

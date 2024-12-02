@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:uas_ml/pengembalian.dart';
 
 class HistoryPengembalian extends StatefulWidget {
   const HistoryPengembalian({super.key});
@@ -23,23 +22,32 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
 
   Future<void> fetchData() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://localhost/uasml/api/pengembalian'));
-      final pinjaman =
-          await http.get(Uri.parse('http://localhost/uasml/api/pinjaman'));
-      if (response.statusCode == 200 && pinjaman.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final responsePengembalian = await http.get(
+        Uri.parse('http://localhost/uasml/api/pengembalian'),
+      );
+      final responsePinjaman = await http.get(
+        Uri.parse('http://localhost/uasml/api/pinjaman'),
+      );
+
+      if (responsePengembalian.statusCode == 200 &&
+          responsePinjaman.statusCode == 200) {
+        final Map<String, dynamic> dataPengembalian =
+            jsonDecode(responsePengembalian.body);
+        final Map<String, dynamic> dataPinjaman =
+            jsonDecode(responsePinjaman.body);
+
         setState(() {
-          daftarPengembalian =
-              List<Map<String, String>>.from(responseData['data'].map((item) {
+          daftarPengembalian = List<Map<String, String>>.from(
+              dataPengembalian['data'].map((item) {
             return {
               'tgl_kembali': item['tgl_kembali'].toString(),
               'kode_pengembalian': item['kode_pengembalian'].toString(),
               'kode_pinjaman': item['kode_pinjaman'].toString(),
             };
           }).toList());
+
           daftarPinjaman =
-              List<Map<String, String>>.from(responseData['data'].map((item) {
+              List<Map<String, String>>.from(dataPinjaman['data'].map((item) {
             return {
               'tgl_pinjam': item['tgl_pinjam'].toString(),
               'kode_pinjaman': item['kode_pinjaman'].toString(),
@@ -48,16 +56,20 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
               'status': item['status'].toString(),
             };
           }).toList());
+
           isLoading = false;
         });
       } else {
         setState(() {
           daftarPengembalian = [];
+          daftarPinjaman = [];
           isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
+        daftarPengembalian = [];
+        daftarPinjaman = [];
         isLoading = false;
       });
       print('Error: $e');
@@ -91,7 +103,7 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
             TextEditingController(text: member['kode_pinjaman']);
         return Dialog(
           child: SizedBox(
-            width: MediaQuery.of(context).size.width, // buat lebar penuh
+            width: MediaQuery.of(context).size.width,
             child: Padding(
               padding: const EdgeInsets.only(
                   left: 20.0, right: 20.0, top: 40.0, bottom: 40.0),
@@ -171,15 +183,36 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
     final kodePinjaman = pengembalian['kode_pinjaman'];
     final pinjaman = daftarPinjaman
         .firstWhere((pinjaman) => pinjaman['kode_pinjaman'] == kodePinjaman);
-    final kodeBuku = pinjaman['kode_pinjaman'];
+    final kodeBuku = pinjaman['kode_buku'];
+
+    print('Kode Buku: $kodeBuku');
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Konfirmasi"),
-          content: Text(
-              "Apakah Anda ingin menghapus pengembalian $kodePengembalian?"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                  "Apakah Anda yakin ingin menghapus pengembalian $kodePengembalian?"),
+              RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(text: "Status buku akan kembali menjadi "),
+                    TextSpan(
+                      text: "'Dipinjam'",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
+                    TextSpan(text: "."),
+                  ],
+                ),
+              ),
+            ],
+          ),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -211,17 +244,16 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                 );
 
                 var updateStok = await http.post(
-                    Uri.parse(
-                        "http://localhost/uasml/api/buku?id=${kodeBuku.toString()}"),
+                    Uri.parse("http://localhost/uasml/api/buku?id=$kodeBuku"),
                     body: {
                       "action": "pinjam",
                     });
 
+                print('updateStok status: $kodeBuku');
+                print('updateStok body: ${updateStok.body}');
+
                 if (response.statusCode == 200 &&
                     updateStok.statusCode == 200) {
-                  print('updateStok status: ${updateStok.statusCode}');
-                  print('updateStok body: ${updateStok.body}');
-
                   updateStatus(kodePinjaman.toString());
                   setState(() {
                     daftarPengembalian.removeWhere((pengembalian) =>
@@ -312,6 +344,7 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                       controller: kodePinjamanController,
                       keyboardType: TextInputType.text,
                       autocorrect: false,
+                      enabled: false,
                       decoration: const InputDecoration(
                         labelText: "Kode Pinjaman",
                         border: OutlineInputBorder(),
@@ -365,7 +398,7 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                                   );
                                 },
                               );
-                              return; // Menghentikan eksekusi jika ada field kosong
+                              return;
                             }
                             var response = await http.post(
                                 Uri.parse(
@@ -458,50 +491,90 @@ class _HistoryPengembalianState extends State<HistoryPengembalian> {
                             children: [
                               // Header Tabel
                               const TableRow(
-                                decoration: BoxDecoration(color: Colors.blue),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueAccent,
+                                ),
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Tgl Kembali',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Tgl Kembali',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode Pengembalian',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode Pengembalian',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Kode Pinjam',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Kode Pinjam',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text('Aksi',
-                                        textAlign: TextAlign.center),
+                                    child: Text(
+                                      'Aksi',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
                                   ),
                                 ],
                               ),
 
                               ...daftarPengembalian.map((pengembalian) {
                                 return TableRow(
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    color: Colors.white,
+                                  ),
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(pengembalian['tgl_kembali']!,
-                                          textAlign: TextAlign.center),
+                                      child: Text(
+                                        pengembalian['tgl_kembali']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                          pengembalian['kode_pengembalian']!,
-                                          textAlign: TextAlign.center),
+                                        pengembalian['kode_pengembalian']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                          pengembalian['kode_pinjaman']!,
-                                          textAlign: TextAlign.center),
+                                        pengembalian['kode_pinjaman']!,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
                                     Row(
                                       mainAxisAlignment:
